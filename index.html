@@ -394,7 +394,7 @@ el.querySelectorAll('[data-m]').forEach(b=>b.onclick=()=>go(b.dataset.m));el.que
 el.onclick=ev=>{if(ev.target===el)close()};draw()}
 
 /* ---------- avvisi, file ---------- */
-let tt=null;
+let tt=null; 
 function toast(msg,undo){const old=document.querySelector('.toast');if(old)old.remove();clearTimeout(tt);const t=document.createElement('div');t.className='toast';t.setAttribute('role','status');t.innerHTML=`<span>${esc(msg)}</span>${undo?'<button>Annulla</button>':''}`;document.body.appendChild(t);if(undo)t.querySelector('button').onclick=()=>{t.remove();undo()};tt=setTimeout(()=>{t.classList.add('out');setTimeout(()=>t.remove(),250)},undo?5000:2400)}
 async function saveFile(name,text,type){const bom=type.includes('csv')?'﻿':'',blob=new Blob([bom+text],{type});
 try{const f=new File([blob],name,{type});if(navigator.canShare&&navigator.canShare({files:[f]})){await navigator.share({files:[f],title:name});return}}catch(e){if(e&&e.name==='AbortError')return}
