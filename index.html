@@ -39,7 +39,7 @@ svg{display:block}
 .mg button.has::after{content:'';position:absolute;left:50%;bottom:6px;width:5px;height:5px;margin-left:-2.5px;border-radius:50%;background:var(--mute)}
 .hero{margin:16px 0 26px}
 .lab{font-size:13px;color:var(--mute)}
-.big{font-size:54px;font-weight:700;letter-spacing:-.03em;line-height:1.05;margin-top:2px}
+.big{font-weight:700;letter-spacing:-.03em;line-height:1.05;margin-top:2px}
 .big small{font-size:24px;font-weight:600;color:var(--mute);letter-spacing:0;margin-left:2px}
 .sub{font-size:14px;color:var(--mute);margin-top:6px}
 .bud{margin-top:18px}
@@ -169,6 +169,14 @@ details[open] summary svg{transform:rotate(180deg)}
 .toast button{color:var(--bg);text-decoration:underline;font-weight:700}
 .toast.out{opacity:0;transition:opacity .25s}
 
+/* saldo totale */
+.wal{background:var(--acc);color:var(--onacc);border-radius:22px;padding:18px 20px;margin:12px 0 6px;box-shadow:0 10px 28px rgba(0,0,0,.14)}
+.wal .l{font-size:14px;font-weight:600;opacity:.78}
+.wal .t{font-size:44px;font-weight:700;letter-spacing:-.03em;line-height:1.1;margin-top:4px}
+.wal .t small{font-size:22px;font-weight:600;opacity:.7;letter-spacing:0}
+.wal p{margin:8px 0 0;font-size:13px;opacity:.78}
+.wal button{margin-top:10px;padding:8px 14px;border-radius:999px;background:color-mix(in srgb,var(--onacc) 18%,transparent);font-size:13px;font-weight:600;color:var(--onacc)}
+.big{font-size:46px}
 /* entrate */
 .in{color:var(--inc)}
 .io{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:18px}
@@ -214,7 +222,7 @@ details[open] summary svg{transform:rotate(180deg)}
 /* ---------- dati di base ---------- */
 const MN=['Gennaio','Febbraio','Marzo','Aprile','Maggio','Giugno','Luglio','Agosto','Settembre','Ottobre','Novembre','Dicembre'];
 const CATS=[['Casa','🏠'],['Spesa','🛒'],['Trasporti','🚗'],['Svago','🎬'],['Ristoranti','🍽️'],['Salute','💊'],['Shopping','🛍️'],['Altro','✨']];
-const ICATS=[['Stipendio','💼'],['Bonus','🎉'],['Regalo','🎁'],['Rimborso','🧾'],['Vendita','🏷️'],['Investimenti','📈'],['Freelance','💻'],['Altro','✨']];
+const ICATS=[['Stipendio','💼'],['Bonus','🎉'],['Regalo','🎁'],['Rimborso','🧾'],['Vendita','🏷️'],['Investimenti','📈'],['Lavoretti','🛠️'],['Altro','✨']];
 const CAT=k=>k==='i'?ICATS:CATS;
 const CL=['#2a78d6','#eb6834','#1baf7a','#eda100','#e87ba4','#008300','#6250d6','#e34948'];
 const CD=['#3987e5','#d95926','#199e70','#c98500','#d55181','#008300','#9085e9','#e66767'];
@@ -242,7 +250,7 @@ const pad=n=>String(n).padStart(2,'0');
 /* ---------- stato ---------- */
 const now=new Date(),curYm=`${now.getFullYear()}-${pad(now.getMonth()+1)}`,todayIso=`${curYm}-${pad(now.getDate())}`;
 const LS='spese-v1';
-let E=[],P={n:'',e:'🙂'},PR={th:'auto',f:'sistema',cur:'EUR',bud:0,hide:false,lc:1,li:0};
+let E=[],P={n:'',e:'🙂'},PR={th:'auto',f:'sistema',cur:'EUR',bud:0,hide:false,lc:1,li:0,start:0};
 let sty='u',tab='home',ym=curYm,per='m',fx='',newId=null,emoOpen=false,open={},selB=-1,selC=-1,selD=-1;
 function load(o){if(!o||typeof o!=='object')return;if(Array.isArray(o.entries))E=o.entries.filter(e=>e&&/^\d{4}-\d{2}-\d{2}$/.test(e.d)&&Number.isFinite(e.a)&&e.a>0&&CAT(e.k)[e.c|0]).map(e=>({id:String(e.id||Date.now().toString(36)+Math.random().toString(36).slice(2,6)),k:e.k==='i'?'i':'u',d:e.d,a:Math.round(e.a),c:e.c|0,n:String(e.n||'').slice(0,80),t:e.t||0}));if(o.profile)P=Object.assign(P,{n:String(o.profile.n||'').slice(0,24),e:o.profile.e||'🙂'});if(o.pref)PR=Object.assign(PR,o.pref)}
 const pack=()=>({v:2,entries:E,profile:P,pref:PR});
@@ -285,7 +293,9 @@ let bud='';if(B>0){const over=t>B,pc=Math.min(t/B*100,100),dl=dimK(k)-now.getDat
 const g={};list.forEach(e=>(g[e.d]=g[e.d]||[]).push(e));
 const days=Object.keys(g).sort().reverse().map(d=>{const rows=g[d].sort((a,b)=>(b.t||0)-(a.t||0)),di=tot(en(rows)),dx=tot(ux(rows)),net=di-dx;return`<div class="dh"><span>${dlong(d)}</span><span class="amt tn ${di>0&&net>0?'in':''}">${di>0?smoney(net):money(dx)}</span></div><div class="grp">${rows.map(e=>{const c=CAT(e.k)[e.c],inc=e.k==='i';return`<button class="row ${e.id===newId?'new':''}" data-ed="${e.id}"><span class="ico" style="background:color-mix(in srgb,${cc(e.c)} 18%,var(--card))">${c[1]}</span><span class="rt"><b>${c[0]}</b>${e.n?`<small>${esc(e.n)}</small>`:''}</span><span class="amt tn ${inc?'in':''}">${inc?'+':''}${money(e.a)}</span></button>`}).join('')}</div>`}).join('');
 const mn=MN[+k.slice(5)-1];
-return`${mhead(k)}
+const wt=(PR.start||0)+tot(en(E))-tot(ux(E)),wa=Math.abs(wt),noBase=!PR.start&&!en(E).length&&E.length>0;
+const wal=`<div class="wal"><div class="l">Soldi che hai in totale</div><div class="t num amt">${wt<0?'−':''}${NI.format(Math.floor(wa/100))}<small>,${pad(wa%100)} ${sym()}</small></div>${noBase?'<p>Ora conta solo le spese. Per il totale giusto indica quanti soldi hai già.</p><button data-goset>Imposta i soldi che hai</button>':PR.start?`<p>Parti da ${money(PR.start)}, più le entrate e meno le spese.</p>`:'<p>Tutte le entrate meno tutte le spese.</p>'}</div>`;
+return`${wal}${mhead(k)}
 <div class="hero"><div class="lab">Speso a ${mn.toLowerCase()}</div><div class="big num amt">${NI.format(Math.floor(t/100))}<small>,${pad(t%100)} ${sym()}</small></div>${delta?`<div class="sub">${delta}</div>`:''}${bud}${I>0?`<div class="io"><div><small>Entrate</small><b class="amt in">+${money(I)}</b></div><div><small>Saldo</small><b class="amt">${smoney(I-t)}</b></div></div>`:''}</div>
 ${days||`<div class="empty"><b>Nessun movimento</b>Tocca + per aggiungere una spesa o un'entrata di ${mn.toLowerCase()}.</div>`}`}
 
@@ -341,7 +351,7 @@ function sec(id,t,body){return`<details class="card" data-s="${id}" ${open[id]?'
 function pSet(){FO.forEach(loadFont);const tk=['auto',...Object.keys(TH)];
 return`<h2 style="margin:6px 0 16px;font-size:24px;display:flex;align-items:center;gap:10px">${svg('sets',26,1.8)}Impostazioni</h2>
 ${sec('asp','Aspetto',`<label class="lbl">Tema</label><div class="sw">${tk.map(k=>`<button class="swb ${PR.th===k?'on':''}" data-th="${k}"><i style="background:${k==='auto'?'linear-gradient(135deg,#f3f4f6 50%,#0e1522 50%)':`linear-gradient(135deg,${TH[k][1]} 50%,${TH[k][6]} 50%)`}"></i>${k==='auto'?'Auto':TH[k][0]}</button>`).join('')}</div><label class="lbl">Carattere (anche per i numeri)</label><div class="fl">${FO.map(f=>`<button class="swb ${PR.f===f[0]?'on':''}" data-f="${f[0]}" style="font-family:${f[2]}">0123<br><small style="font-family:var(--f)">${f[1]}</small></button>`).join('')}</div>`)}
-${sec('bud','Budget e valuta',`<label class="lbl">Budget mensile (lascia vuoto per non averlo)</label><div class="inl"><input type="text" id="bu" inputmode="decimal" placeholder="es. 800" value="${PR.bud?(PR.bud/100).toString().replace('.',','):''}"><button class="go" id="sb">Salva</button></div><label class="lbl" style="margin-top:16px">Valuta</label><div class="chips">${Object.keys(SYM).map(c=>`<button class="${PR.cur===c?'on':''}" data-cur="${c}">${c==='CHF'?'CHF':SYM[c]+' '+c}</button>`).join('')}</div>`)}
+${sec('bud','Soldi, budget e valuta',`<label class="lbl">Soldi che hai già (saldo di partenza)</label><input type="text" id="st" inputmode="decimal" placeholder="es. 1500" value="${PR.start?(PR.start/100).toString().replace('.',','):''}"><p class="note" style="margin:6px 0 14px">Quanti soldi hai adesso, prima di registrare i movimenti. Serve per il totale in Home.</p><label class="lbl">Budget mensile (lascia vuoto per non averlo)</label><input type="text" id="bu" inputmode="decimal" placeholder="es. 800" value="${PR.bud?(PR.bud/100).toString().replace('.',','):''}"><button class="go" id="sb" style="margin-top:12px">Salva</button><label class="lbl" style="margin-top:18px">Valuta</label><div class="chips">${Object.keys(SYM).map(c=>`<button class="${PR.cur===c?'on':''}" data-cur="${c}">${c==='CHF'?'CHF':SYM[c]+' '+c}</button>`).join('')}</div>`)}
 ${sec('dat','Dati',`<button class="go" id="ex">Scarica i movimenti (CSV)</button><button class="go ghost" id="bk">Scarica backup completo</button><button class="go ghost" id="rs">Ripristina da backup</button><input type="file" id="rf" accept=".json,application/json" hidden><button class="go warn" id="wp">Cancella tutti i dati</button><p class="note">I dati restano su questo telefono. Fai ogni tanto un backup.</p>`)}
 `}
 
@@ -382,8 +392,9 @@ g('details[data-s]').forEach(d=>d.ontoggle=()=>{open[d.dataset.s]=d.open});
 g('[data-th]').forEach(b=>b.onclick=()=>{PR.th=b.dataset.th;save();applyPref();render()});
 g('[data-f]').forEach(b=>b.onclick=()=>{PR.f=b.dataset.f;save();applyPref();render()});
 g('[data-cur]').forEach(b=>b.onclick=()=>{PR.cur=b.dataset.cur;save();render()});
-const sbt=a.querySelector('#sb');if(sbt)sbt.onclick=()=>{const v=a.querySelector('#bu').value.trim();if(!v){PR.bud=0;save();render();return toast('Budget tolto')}const c=parseAmt(v);if(!c)return toast('Inserisci un importo valido');PR.bud=c;save();render();toast('Budget salvato')};
-const ex=a.querySelector('#ex');if(ex){ex.onclick=exportCsv;a.querySelector('#bk').onclick=()=>saveFile('spese-backup.json',JSON.stringify(pack()),'application/json');const rf=a.querySelector('#rf');a.querySelector('#rs').onclick=()=>rf.click();rf.onchange=restore;a.querySelector('#wp').onclick=()=>{if(confirm('Cancellare tutti i movimenti e le impostazioni? Non si può annullare.')){E=[];P={n:'',e:'🙂'};PR=Object.assign(PR,{bud:0});save();ym=curYm;render();toast('Dati cancellati')}}}}
+const sbt=a.querySelector('#sb');if(sbt)sbt.onclick=()=>{const v=a.querySelector('#bu').value.trim(),w=a.querySelector('#st').value.trim();let bud=0,start=0;if(v){bud=parseAmt(v);if(!bud)return toast('Il budget non è valido')}if(w&&!/^[-−]?0([.,]0*)?$/.test(w)){const c=parseAmt(w.replace(/^[-−]/,''));if(!c)return toast('Il saldo di partenza non è valido');start=/^[-−]/.test(w)?-c:c}PR.bud=bud;PR.start=start;save();render();toast('Salvato')};
+g('[data-goset]').forEach(b=>b.onclick=()=>{tab='imp';open.bud=true;fx='t';render();window.scrollTo(0,0)});
+const ex=a.querySelector('#ex');if(ex){ex.onclick=exportCsv;a.querySelector('#bk').onclick=()=>saveFile('spese-backup.json',JSON.stringify(pack()),'application/json');const rf=a.querySelector('#rf');a.querySelector('#rs').onclick=()=>rf.click();rf.onchange=restore;a.querySelector('#wp').onclick=()=>{if(confirm('Cancellare tutti i movimenti e le impostazioni? Non si può annullare.')){E=[];P={n:'',e:'🙂'};PR=Object.assign(PR,{bud:0,start:0});save();ym=curYm;render();toast('Dati cancellati')}}}}
 function scrub(svgEl,fn){const h=e=>{const r=svgEl.getBoundingClientRect();fn({x:(e.clientX-r.left)/r.width*VW})};svgEl.addEventListener('pointerdown',h);svgEl.addEventListener('pointermove',e=>{if(e.pointerType==='mouse'||e.buttons||e.pointerType==='touch')h(e)})}
 
 /* ---------- foglio nuovo movimento ---------- */
